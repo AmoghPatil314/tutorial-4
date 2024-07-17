@@ -1,0 +1,17 @@
+---
+title: "Models"
+author: "Amogh Patil"
+format: html
+execute:
+  echo: false
+---
+
+Using data from a YouGov poll of 1,559 US adult citizens, conducted March 10 - 12, 2024, we are trying to find what % of voters will vote for Biden in 2024.
+
+```{r}
+#| label: setup
+#| message: FALSE
+library(tidyverse)
+
+```
+
