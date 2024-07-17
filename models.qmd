@@ -6,12 +6,43 @@ execute:
   echo: false
 ---
 
-Using data from a YouGov poll of 1,559 US adult citizens, conducted March 10 - 12, 2024, we are trying to find what % of voters will vote for Biden in 2024. The proportion might change until election day.
+Using data from a YouGov poll of 1,559 US adult citizens, conducted March 10 - 12, 2024, we are trying to find what % of voters will vote for Biden in 2024. The proportion might change until election day. The number is around 42%, but it will vary by around 5%. Because no algorithm is perfect, there will be some uncertanty. However, conducting more polls may help narrow the results.
+
+We will use this formula:
+$$ biden_i =  \mu + \epsilon_i $$
 
 ```{r}
 #| label: setup
 #| message: FALSE
 library(tidyverse)
+library(brms)
+library(tidybayes)
+library(gtsummary)
 
+```
+
+```{r}
+#| label: model
+#| cache: true
+fit_bern<-brm(formula = biden ~ 1, data = poll_data, family = bernoulli(), refresh = 0, silent = 2, seed = 9)
+```
+
+```{r}
+tbl_regression(fit_bern, intercept=TRUE)
+```
+
+```{r}
+#| label: plot
+fit_bern|>
+  add_epred_draws(ndata)|>
+    select(.epred)|>
+      ggplot(aes(x=.epred, y=after_stat(count/sum(count))))+
+      geom_density()+
+      scale_x_continuous(labels = scales::percent_format())+
+      scale_y_continuous(labels = scales::percent_format())+
+      labs(title="Posterior Distribution for $ \rho $",
+           subtitle="There is a 95% chance for a value between XX and XX",
+           x="Proportion,$ \rho $,of red beads in Urn",
+           y="Probability")
 ```
 
